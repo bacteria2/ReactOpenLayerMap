@@ -1,0 +1,53 @@
+#layerbox {
+    background: #fff;
+    z-index: 112;
+    border-radius: 1px;
+    box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+    font-size: 12px;
+    line-height: 1.5;
+    color: #565656;
+    word-wrap: break-word;
+    font-family: Arial, sans-serif;
+}
+
+#layerbox_item {
+    font-size: 14px;
+    line-height: 18px;
+    color: #565656;
+    word-wrap: break-word;
+    padding: 7px 0 12px;
+    background: #fff;
+    border-radius: 4px;
+    border: solid 1px gainsboro;
+}
+#layerbox_item .item, #layerbox_item .item span, #measureTool .item span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#layerbox_item .item {
+    height: 16px;
+    padding: 0 6px;
+    border-right: 1px #e5e5e5 solid;
+    cursor: pointer;
+}
+#layerbox_item .item:hover {
+  color:lightblue;
+}
+
+#layerbox_item .item .icon {
+    margin-right: 7px;
+}
+
+#layerbox_item .layer-title{
+    display: flex;
+    justify-content: space-between;
+}
+.close-wrapper{
+    line-height: 48px;
+}
+
+#layerbox_item .layer-card-icon{
+    height: 36px;
+    width: 36px;
+}
