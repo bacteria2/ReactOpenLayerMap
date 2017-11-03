@@ -1,175 +1,8 @@
 /**
  * Created by lenovo on 2017/10/25.
  */
-//import ol from "openlayers";
-
 import {ol} from './mapLib';
 
-
-
-
-/**
- * Format length output.
- * @param {ol.geom.LineString} line The line.
- * @return {string} The formatted length.
- */
-function formatLength(line) {
-    let length = ol.Sphere.getLength(line);
-    let output;
-    if (length > 1000) {
-        output = (Math.round(length / 1000 * 100) / 100) +
-            ' ' + 'km';
-    } else {
-        output = (Math.round(length * 100) / 100) +
-            ' ' + 'm';
-    }
-    return output;
-}
-
-
-/**
- * Format area output.
- * @param {ol.geom.Polygon} polygon The polygon.
- * @return {string} Formatted area.
- */
-function formatArea(polygon) {
-    let area = ol.Sphere.getArea(polygon);
-    let output;
-    if (area > 10000) {
-        output = (Math.round(area / 1000000 * 100) / 100) +
-            ' ' + 'km<sup>2</sup>';
-    } else {
-        output = (Math.round(area * 100) / 100) +
-            ' ' + 'm<sup>2</sup>';
-    }
-    return output;
-}
-
-
-/*function measureTool() {
-    ele = document.getElementById('measureTool');
-    ele.style.display == "none" ? ele.style.display = "block" : ele.style.display = "none"
-}
-/!**
- *
- * *!/
-function pointerMoveHandler(evt) {
-    if (evt.dragging) return
-    var helpMsg = 'Click to start drawing';
-    if (sketch) {
-        var geom = (sketch.getGeometry());
-        if (geom instanceof ol.geom.Polygon) {
-            helpMsg = continuePolygonMsg;
-        } else if (geom instanceof ol.geom.LineString) {
-            helpMsg = continueLineMsg;
-        }
-    }
-
-    helpTooltipElement.innerHTML = helpMsg;
-    helpTooltip.setPosition(evt.coordinate);
-
-    helpTooltipElement.classList.remove('hidden');
-}
-/!**
- * Creates a new help tooltip
- *!/
-function createHelpTooltip() {
-    if (helpTooltipElement) {
-        helpTooltipElement.parentNode.removeChild(helpTooltipElement);
-    }
-    helpTooltipElement = document.createElement('div');
-    helpTooltipElement.className = 'tooltip hidden';
-    helpTooltip = new ol.Overlay({
-        element: helpTooltipElement,
-        offset: [15, 0],
-        positioning: 'center-left'
-    });
-    map.addOverlay(helpTooltip);
-}
-
-/!**
- * Creates a new measure tooltip
- *!/
-function createMeasureTooltip() {
-    if (measureTooltipElement) {
-        measureTooltipElement.parentNode.removeChild(measureTooltipElement);
-    }
-    measureTooltipElement = document.createElement('div');
-    measureTooltipElement.className = 'tooltip tooltip-measure';
-    measureTooltip = new ol.Overlay({
-        element: measureTooltipElement,
-        offset: [0, -15],
-        positioning: 'bottom-center'
-    });
-    map.addOverlay(measureTooltip);
-}
-
-function addInteraction() {
-    var type = (typeSelect == 'area' ? 'Polygon' : 'LineString');
-    draw = new ol.interaction.Draw({
-        source: source,
-        type: /!** @type {ol.geom.GeometryType} *!/ (type),
-        style: new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: 'rgba(0, 0, 0, 0.5)',
-                lineDash: [10, 10],
-                width: 2
-            }),
-            image: new ol.style.Circle({
-                radius: 5,
-                stroke: new ol.style.Stroke({
-                    color: 'rgba(0, 0, 0, 0.7)'
-                }),
-                fill: new ol.style.Fill({
-                    color: 'rgba(255, 255, 255, 0.2)'
-                })
-            })
-        })
-    });
-    map.addInteraction(draw);
-
-    createMeasureTooltip();
-    createHelpTooltip();
-
-    var listener;
-    draw.on('drawstart',
-        function (evt) {
-            // set sketch
-            sketch = evt.feature;
-
-            /!** @type {ol.Coordinate|undefined} *!/
-            var tooltipCoord = evt.coordinate;
-
-            listener = sketch.getGeometry().on('change', function (evt) {
-                var geom = evt.target;
-                var output;
-                if (geom instanceof ol.geom.Polygon) {
-                    output = formatArea(geom);
-                    tooltipCoord = geom.getInteriorPoint().getCoordinates();
-                } else if (geom instanceof ol.geom.LineString) {
-                    output = formatLength(geom);
-                    tooltipCoord = geom.getLastCoordinate();
-                }
-                measureTooltipElement.innerHTML = output;
-                measureTooltip.setPosition(tooltipCoord);
-            });
-        }, this);
-
-    draw.on('drawend',
-        function () {
-            measureTooltipElement.className = 'tooltip tooltip-static';
-            measureTooltip.setOffset([0, -7]);
-            // unset sketch
-            sketch = null;
-            // unset tooltip so that a new one can be created
-            measureTooltipElement = null;
-            createMeasureTooltip();
-            ol.Observable.unByKey(listener);
-        }, this);
-}*/
 
 /**
  *  获取最大分辨率
@@ -245,6 +78,9 @@ export function getControls(controlArray){
     })
 }
 
+/**
+ * 获取配置的layers
+ * */
 export function getLayers(system,layers){
     if (!Array.isArray(layers)||layers.length===0)
         return [];

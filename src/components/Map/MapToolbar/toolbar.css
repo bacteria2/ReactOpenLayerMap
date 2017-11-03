@@ -112,6 +112,12 @@
     padding: 8px 10px 8px;
     opacity: 0.95;
     border-radius: 8px;
+    position: relative;
+}
+.layer-info .cloud-popup{
+    height:45px;
+    width:60px;
+    position:absolute;
 }
 
 /*common layer*/
