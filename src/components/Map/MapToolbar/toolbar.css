@@ -1,3 +1,4 @@
+/*layercontrol*/
 #layerbox {
     background: #fff;
     z-index: 112;
@@ -20,6 +21,7 @@
     border-radius: 4px;
     border: solid 1px gainsboro;
 }
+
 #layerbox_item .item, #layerbox_item .item span, #measureTool .item span {
     display: inline-block;
     vertical-align: middle;
@@ -31,23 +33,289 @@
     border-right: 1px #e5e5e5 solid;
     cursor: pointer;
 }
+
 #layerbox_item .item:hover {
-  color:lightblue;
+    color: lightblue;
 }
 
 #layerbox_item .item .icon {
     margin-right: 7px;
 }
 
-#layerbox_item .layer-title{
+#layerbox_item .layer-title {
     display: flex;
     justify-content: space-between;
 }
-.close-wrapper{
+
+.close-wrapper {
     line-height: 48px;
 }
 
-#layerbox_item .layer-card-icon{
+#layerbox_item .layer-card-icon {
     height: 36px;
     width: 36px;
 }
+
+/*tooltip*/
+.tooltip {
+    position: relative;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    color: white;
+    padding: 4px 8px;
+    opacity: 0.7;
+    white-space: nowrap;
+}
+
+.tooltip-measure {
+    opacity: 1;
+    font-weight: bold;
+}
+
+.tooltip-static {
+    background-color: #f6faff;
+    color: #2a6cff;
+    border: 1px solid #121212;
+}
+
+.tooltip-measure:before,
+.tooltip-static:before {
+    border-top: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    margin-left: -7px;
+    left: 50%;
+}
+
+.tooltip-static:before {
+    border-top-color: #121211;
+}
+
+.tooltip-static .measure-close-btn {
+    margin-left: 10px;
+    border: 1px solid;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+/*layer info*/
+.layer-info {
+    background: #333;
+    color: white;
+    font-size: 16px;
+    padding: 8px 10px 8px;
+    opacity: 0.95;
+    border-radius: 8px;
+}
+
+/*common layer*/
+.layer-info .layer-info-header {
+    height: 40px;
+    line-height: 40px;
+    font-weight: bold;
+}
+
+.layer-info .layer-info-table {
+    padding: 8px 8px 12px;
+    position: relative;
+}
+
+.layer-info .layer-info-label {
+    padding: 4px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.layer-info-label .label {
+    min-width: 80px;
+    text-align: justify;
+    width: 80px;
+    height: 32px;
+    margin-right: 8px;
+}
+
+.layer-info-label .label:after {
+    content: "";
+    width: 100%;
+    display: inline-block;
+    line-height: 0;
+    font-size: 0;
+    height: 0;
+}
+
+.layer-info .layer-info-label .content {
+    word-break: break-all;
+}
+
+.layer-info-label .content::before {
+    content: ":";
+    margin-left: -8px;
+    padding-right: 8px;
+}
+
+.layer-info .label-content {
+    width: 70%;
+}
+
+/*Header*/
+.layer-info .layer-info-header {
+    padding-left: 8px;
+}
+
+.layer-info .layer-info-header .icon {
+    border: 1px solid #666666;
+    cursor: pointer;
+    float: right;
+    width: 36px;
+    font-size: 32px;
+    height: 36px;
+    text-align: center;
+    line-height: 36px;
+}
+
+.layer-info-hr {
+    margin: 3px -10px 3px;
+    height: 1px;
+}
+
+/*dangerous*/
+.layer-info .danger-info {
+    width: 480px;
+}
+
+.layer-info .danger-status {
+    height: 40px;
+    line-height: 40px;
+    background: #374751;
+    border: 1px solid #374751;
+    margin-left: -8px;
+    margin-right: -8px;
+}
+.layer-info .danger-status label {
+    margin-left: 12px;
+    font-weight: normal;
+}
+.layer-info .danger-status span {
+    cursor:pointer;
+    margin-left: 5px;
+    font-weight: bold;
+}
+.layer-info .danger-level {
+    height: 84px;
+    table-layout: fixed;
+    border: 1px solid #182325;
+
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.layer-info .danger-analysis{
+    position:relative;
+    padding:8px;
+}
+
+.danger-analysis .analysis-progress{
+    width:70%
+}
+.danger-analysis .analysis-progress div{
+    margin-bottom:8px;
+}
+.danger-analysis .analysis-progress .analysis-progress-btn{
+    position:absolute;
+    bottom:30px
+}
+.danger-analysis .analysis-level{
+    position:absolute;
+    right:10%;
+    top:10px;
+    height:52px
+}
+.danger-analysis .analysis-level img{
+    display:block;
+    margin:0 auto
+}
+
+
+
+.layer-info .danger-level tr:first-child {
+    height: 26px;
+}
+
+.danger-level .danger-description {
+    height: 64px;
+    color: #BFBEBF;
+}
+
+.danger-level .danger-description td {
+    word-wrap: break-word;
+    border-left: 1px solid #182325;
+    border-top: 1px solid #182325;
+    vertical-align: top;
+    padding: 4px;
+}
+
+.danger-addition tr {
+    height: 28px;
+    font-size: 14px;
+    color: #BFBEBF;
+    text-align-last: justify;
+}
+
+.danger-addition .addition-label {
+    width: 66px;
+}
+
+.danger-addition .addition-label:after {
+    content: ":";
+}
+
+.danger-addition .addition-text input {
+    background-color: #1E292B;
+    height: 23px;
+    border: #3A484C 1px solid;
+}
+
+.layer-info .danger-status {
+
+}
+
+.layer-info .danger-index {
+    text-align: center;
+    border-left: 1px solid #182325;
+    border-top: 1px solid #182325;
+}
+
+.danger-index.eq30 {
+    color: #16AF3A;
+}
+
+.danger-index.gt30 {
+    color: #D8C93D;
+}
+
+.danger-index.gt60 {
+    color: #FD9239;
+}
+
+.danger-index.gt80 {
+    color: #FF0000;
+}
+
+/*goods类别 team 类别*/
+.layer-info .goods-info, .team-info, .hospital-info, .shelter-info, .protect-info {
+    width: 420px;
+}
+
+.layer-info .layer-info-image {
+    max-height: 110px;
+    max-width: 110px;
+    position: absolute;
+    right: 8px;
+    top: 16px;
+}
+

@@ -4,7 +4,7 @@
 import React, {Component} from "react";
 import proj4 from "proj4";
 import {ol} from "./mapLib";
-
+import './index.css'
 import {getControls, getLayers} from "./MapUtils";
 import MapConfig from "./MapConfig/index";
 import Toolbar from "./MapToolbar";
@@ -23,6 +23,7 @@ function mapInitialize({
         layers: [...getLayers(projection, layers)],
         //target: 'map',
         controls: ol.control.defaults().extend(getControls(controls)),
+       // interactions: ol.interaction.defaults({doubleClickZoom: false}),
         view: new ol.View({
             center,
             minZoom,
@@ -47,6 +48,7 @@ export default class OpenalayerMap extends Component {
     }
 
     componentDidMount() {
+
           this.state.map.setTarget("map")
     }
 
