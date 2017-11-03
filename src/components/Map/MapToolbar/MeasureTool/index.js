@@ -3,7 +3,7 @@
  */
 import React, {Component} from "react";
 import {createPortal} from "react-dom";
-import {ol} from "../../mapLib";
+import {ol} from "../../mapResource";
 import {Menu, message} from "antd";
 import classnames from "classnames";
 /**

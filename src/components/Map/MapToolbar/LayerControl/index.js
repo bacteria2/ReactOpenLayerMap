@@ -4,8 +4,9 @@
 import React, {Component} from "react";
 import {createPortal} from "react-dom";
 import {Button, Card, Checkbox} from "antd";
-import {dangerous, goods, hospital, ol, protect, shelter, team} from "../../mapLib";
-import InfoOverlay from './InfoOverlay'
+import {dangerous, goods, hospital, ol, protect, shelter, team} from "../../mapResource";
+import InfoOverlay from "./InfoOverlay";
+import {getFeatureList} from "@/Service/MapService";
 
 const gridStyle = {
     width: '100%',
@@ -26,10 +27,9 @@ let grids = [
 export default class LayerControl extends Component {
     constructor(props) {
         super(props);
-        this.controlLayers = {};
+        this.layerMapper = {};
         //控制图层转换映射mapper
-        this.controlLayers = grids.map((el, index) => {
-            let layer = new ol.layer.Vector({
+        this.controlLayers = grids.map(el => new ol.layer.Vector({
                 source: new ol.source.Vector(),
                 style: new ol.style.Style({
                     image: new ol.style.Icon({
@@ -37,28 +37,18 @@ export default class LayerControl extends Component {
                     })
                 }),
                 visible: el.visible,
-                selectable: true
+                selectable: true,
+                layerType: el.value,
             })
-            let feature = new ol.Feature({
-                geometry: new ol.geom.Point([12614135.26 + index * 1000, 2647243.60]),
-                layerInfo: {
-                    type: el.value,
-                    id: index
-                }
-            });
-            layer.getSource().addFeature(feature)
-            return layer;
-        });
-
-
+        );
         this.map = this.props.map;
 
         //添加layer到map内
         this.controlLayers.forEach((el) => {
+            let {layerType} = el.getProperties();
             this.map.addLayer(el);
-            this.controlLayers[el.value] = el;
+            this.layerMapper[layerType] = el;
         })
-
     }
 
     state = {
@@ -66,9 +56,10 @@ export default class LayerControl extends Component {
         indeterminate: false,
         checkedList: [],
         checkAll: false,
+        featureList: [],
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         // change mouse cursor when over marker
         this.map.on('pointermove', (e) => {
             if (e.dragging)  return;
@@ -81,6 +72,16 @@ export default class LayerControl extends Component {
             let ele = document.getElementById(this.map.getTarget());
             ele.style.cursor = hit ? 'pointer' : '';
         })
+        let el = await getFeatureList();
+        this.setState({featureList: el.data})
+    }
+
+    addFeature({latitude, type, longitude, id}) {
+        let layer = this.layerMapper[type];
+        layer.getSource().addFeature(new ol.Feature({
+            geometry: new ol.geom.Point([latitude, longitude]),
+            layerInfo: {type, id}
+        }))
     }
 
     onChange = (checkedList) => {
@@ -109,6 +110,10 @@ export default class LayerControl extends Component {
         this.controlLayers.forEach(el => el.setVisible(e.target.checked))
     }
 
+    componentWillUpdate() {
+        this.state.featureList.forEach(el => this.addFeature(el))
+    }
+
     componentWillUnmount() {
         this.controlLayers.forEach(el => this.map.removeLayer(el))
     }
@@ -134,7 +139,7 @@ export default class LayerControl extends Component {
         //图层选项
         let checkOptions = grids.map((el, index) => ({
             value: el.value,
-            label: <Card.Grid style={gridStyle} key={index}>
+            label: <Card.Grid style={gridStyle} key={el.text + index}>
                 <img src={el.img} className="layer-card-icon"/>
                 <div>{el.text}</div>
             </Card.Grid>

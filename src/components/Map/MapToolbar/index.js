@@ -42,10 +42,6 @@ export default class extends Component {
                         <span className="icon iconfont">&#xe70d;</span>
                         <span className="name">图层控制</span>
                     </div>
-               {/*     <div className="layer_item layercontrol item" onClick={() =>this.setState({clearMeasure:true})}>
-                        <span className="icon iconfont">&#xe639;</span>
-                        <span className="name">清除标记</span>
-                    </div>*/}
                 </div>
                 <LayerControl visible={this.state.showLayerControls}
                               onClose={() => this.setState({showLayerControls: false})}

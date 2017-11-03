@@ -3,9 +3,9 @@
  */
 import React, {Component} from "react";
 import proj4 from "proj4";
-import {ol} from "./mapLib";
+import {ol} from "./mapResource";
 import './index.css'
-import {getControls, getLayers} from "./MapUtils";
+import {getControls, getLayers} from "./MapHelper";
 import MapConfig from "./MapConfig/index";
 import Toolbar from "./MapToolbar";
 
@@ -21,9 +21,7 @@ function mapInitialize({
 
     return  new ol.Map({
         layers: [...getLayers(projection, layers)],
-        //target: 'map',
         controls: ol.control.defaults().extend(getControls(controls)),
-       // interactions: ol.interaction.defaults({doubleClickZoom: false}),
         view: new ol.View({
             center,
             minZoom,
@@ -38,23 +36,15 @@ function mapInitialize({
 export default class OpenalayerMap extends Component {
     constructor(props) {
         super(props);
-
         let config = MapConfig[this.props.mapConfig] || MapConfig.Tianditu;
-        let map = mapInitialize(config);
-
-        this.state={
-            map
-        }
+        this.map = mapInitialize(config);
     }
-
     componentDidMount() {
-
-          this.state.map.setTarget("map")
+          this.map.setTarget("map")
     }
-
     render() {
         return <div id="map">
-            <Toolbar map={this.state.map}/>
+            <Toolbar map={this.map}/>
         </div>
     }
 }

@@ -1,7 +1,7 @@
 /**
  * Created by lenovo on 2017/10/25.
  */
-import {ol} from './mapLib';
+import {ol} from './mapResource';
 
 
 /**

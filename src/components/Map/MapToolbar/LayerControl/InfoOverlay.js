@@ -3,8 +3,8 @@
  */
 import React, {Component} from "react";
 import {createPortal} from "react-dom";
-import {level1,level2,level3, level4,nullImage, ol, timeAxis, timeBtn,cloudPopup} from "../../mapLib";
-
+import {cloudPopup, level1, level2, level3, level4, nullImage, ol, timeAxis, timeBtn} from "../../mapResource";
+import {getFeatureById} from "@/Service/MapService";
 
 function LayerLabel({title, content}) {
     return <div className="layer-info-label">
@@ -38,10 +38,10 @@ function AlertTd({label, value}) {
 }
 
 const statusArray = [
-    {label: "正常", description: '正常',levelImg:level1,imgText:"正常等级",color: '#5ffd00'},
-    {label: "警示", description: '警示',levelImg:level2,imgText:"警示等级",color: '#fde500'},
-    {label: "发生预警", description: '发生预警',levelImg:level3,imgText:"预警等级", color: '#FD6300'},
-    {label: "危险", description: '危险',levelImg:level4,imgText:"危险等级",color: '#fd0c1c'},
+    {label: "正常", description: '正常', levelImg: level1, imgText: "正常等级", color: '#5ffd00'},
+    {label: "警示", description: '警示', levelImg: level2, imgText: "警示等级", color: '#fde500'},
+    {label: "发生预警", description: '发生预警', levelImg: level3, imgText: "预警等级", color: '#FD6300'},
+    {label: "危险", description: '危险', levelImg: level4, imgText: "危险等级", color: '#fd0c1c'},
 ];
 
 export default class InfoOverlay extends Component {
@@ -49,7 +49,6 @@ export default class InfoOverlay extends Component {
         super(props)
         this.el = document.createElement('div');
         this.el.classList.add('layer-info');
-
         this.map = props.map;
         this.infoOverlay = new ol.Overlay({
             element: this.el,
@@ -59,85 +58,64 @@ export default class InfoOverlay extends Component {
         });
         this.map.addOverlay(this.infoOverlay);
         this.infoOverlay.setPosition(undefined);
-
         // display Overlay on click
         this.map.on('click', evt => {
             let feature = this.map.forEachFeatureAtPixel(evt.pixel, feature => feature, {layerFilter: layer => layer.getProperties()['selectable']});
             if (feature) {
                 let coordinates = feature.getGeometry().getCoordinates();
+                let view=    this.map.getView();
                 let {id, type} = feature.getProperties()['layerInfo'];
                 if (type) {
-                    this.setState({id, type});
-                    this.infoOverlay.setPosition(coordinates)
+                    this.infoOverlay.setPosition(coordinates);
+                    view.centerOn(coordinates,this.map.getSize(),[window.innerWidth/2,window.innerHeight/2]);
+                    getFeatureById(id).then(el => {
+                        this.setState({resp: el.data});
+                    })
                 }
             }
         });
     }
 
     state = {
-        id: "",
-        type: "default",
+        resp: null
     }
 
 
     render() {
-        let id = this.state.id;
-        let resp = this.getLayerInfo(id);
-        let OverlayInfo = resp ? this[resp.type] : this.defaultInfo;
-        let cloudStyle={
-            background:`url(${cloudPopup})`,
-            left:'calc(50% - 30px)',
-            bottom:-20
+        // let id = this.state.id;
+        // let resp = getFeatureById(id);
+        let cloudStyle = {
+            background: `url(${cloudPopup})`,
+            left: 'calc(50% - 30px)',
+            bottom: -20
         };
-        return createPortal([<div className="cloud-popup" style={cloudStyle} key="cloud"/>,<OverlayInfo {...resp} key="Overlay"/>    ]
-           , this.el)
+        if (this.state.resp) {
+            let OverlayInfo = this[this.state.resp.type];
+            return createPortal([<div className="cloud-popup" style={cloudStyle} key="cloud"/>,
+                    <OverlayInfo {...this.state.resp} key="Overlay"/>]
+                , this.el)
+        }
+        return null;
     }
 
     hiddenOverlay = () => this.infoOverlay.setPosition(undefined)
 
-    getLayerInfo(id) {
-        let mockData = [
-            {
-                title: "光明桥化学物品储藏处",
-                alertLevel: 50,
-                alertType: "易爆炸物品储藏",
-                name: "工矿业炸药",
-                administration: "区环保局",
-                phone: 9837121211221,
-                contacts: "洋伞",
-                type: "dangerous"
-            },
-            {title: "XX警戒保护区", type: "protect", name: "野生动物园", contacts: "杨树增", phone: 7712312332},
-            {title: "运动广场", people: 220, phone: 777221212, name: "清远小学111111111111111112121312321", type: "team"},
-            {title: "大号防护服", phone: 121277221212, name: "霹雳啪啦消防栓", administration: "应急处", account: 120, type: "goods"},
-            {
-                title: "笔架路医疗救助站",
-                address: "广东省清远市清新区笔架路22号华东状元小区12栋一单元2203号",
-                phone: 112312317221212,
-                name: "霹雳啪啦消防栓",
-                type: "hospital"
-            },
-            {title: "露天避难所", type: "shelter", name: "笔架山XXX公园", available: 550, contacts: "杨xx", phone: "7711123312"}
-        ]
-
-        return mockData[id];
-    }
 
     defaultInfo() {
         return <div className="defaultInfo-info">some wrong with sever</div>
     }
 
     dangerous = (props) => {
-        let level=3;
-        if(props.alertLevel<=80){
-            level=2;
-            if(props.alertLevel<=60){
-                level=1;
-                if(props.alertLevel<=30)
-                    level=0;
+        let level = 3;
+        if (props.alertLevel <= 80) {
+            level = 2;
+            if (props.alertLevel <= 60) {
+                level = 1;
+                if (props.alertLevel <= 30)
+                    level = 0;
             }
         }
-        let {description,label,levelImg,imgText,color}=statusArray[level];
+        let {description, label, levelImg, imgText, color} = statusArray[level];
         return (
             <div className="danger-info">
                 <CommonHeader title={props.title} onClickHandler={this.hiddenOverlay}/>
@@ -151,7 +129,8 @@ export default class InfoOverlay extends Component {
                     <div className="analysis-progress">
                         <div>危险性分析</div>
                         <img src={timeAxis}/>
-                        <img className="analysis-progress-btn" src={timeBtn} style={{left: props.alertLevel>100?300:props.alertLevel* 3}}/>
+                        <img className="analysis-progress-btn" src={timeBtn}
+                             style={{left: props.alertLevel > 100 ? 300 : props.alertLevel * 3}}/>
                     </div>
                     <div className="analysis-level">
                         <img src={levelImg}/>

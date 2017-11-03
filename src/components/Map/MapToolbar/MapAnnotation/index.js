@@ -2,7 +2,7 @@
  * Created by lenovo on 2017/11/1.
  */
 import React, {Component} from "react";
-import {location, ol} from "../../mapLib";
+import {location, ol} from "../../mapResource";
 
 const AnnotationConfig = {}
 
