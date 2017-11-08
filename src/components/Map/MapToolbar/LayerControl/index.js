@@ -106,13 +106,13 @@ export default class LayerControl extends Component {
      * 根据传入坐标的半径和类型，查找符合条件的标记
      * */
     radiusAnalyse = (evt) => {
-        let {type, radius, coordinate: [x, y]} = evt.data.location;
+        let {type, radius, coordinate} = evt.data.location;
         //生成半径为radius的圆
         this.analyseLayer.getSource().clear();
         let feature = new ol.Feature({
-            geometry: new ol.geom.Circle([x, y], radius)
+            geometry: new ol.geom.Circle(coordinate, radius)
         })
-
+        console.log(feature)
         this.analyseLayer.getSource().addFeature(feature)
 
         //获取指定类型的图层，不为空则测算该图层内是否有标记点在圆形范围内
@@ -123,11 +123,12 @@ export default class LayerControl extends Component {
             targetLayer.getSource().forEachFeatureIntersectingExtent(
                 feature.getGeometry().getExtent(),
                 f => {
-                    let attach = this.radiusAnalyseFeatureHandler(f, {type, coordinate: [x, y]});
-
+                    let attach = this.radiusAnalyseFeatureHandler(f, {type, coordinate});
                     if (attach) featureList.push(attach)
                 })
         }
+        //跨窗口发送数据
+        evt.source.postMessage({type:"radiusAnalyse",data:featureList},window.origin);
         return featureList;
     }
     /**

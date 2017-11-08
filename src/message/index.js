@@ -8,12 +8,20 @@ export default class Message {
         this._openWin();
         this.eventListner = {
             'annotationLocated': [],
+            'radiusAnalyse':[],
         }
+
+        this.eventListnerOnce={
+            'annotationLocated': [],
+            'radiusAnalyse':[],
+        }
+
         window.addEventListener('message', event => {
             let {type, data} = event.data;
-            let callBackList = this.eventListner[type];
-            if (Array.isArray(callBackList))
-                callBackList.forEach(el => el.call(window,data))
+            this.eventListner[type]&&this.eventListner[type].forEach(el => el.call(window,data));
+
+            this.eventListnerOnce[type]&&this.eventListnerOnce[type].forEach(el => el.call(window,data));
+            this.eventListnerOnce[type]=[];
         })
     }
 
@@ -50,6 +58,12 @@ export default class Message {
         if (typeof fn !== 'function')
             return
         this.eventListner[event]&&this.eventListner[event].push(fn)
+    }
+
+    once(event,fn){
+        if (typeof fn !== 'function')
+            return
+        this.eventListnerOnce[event]&&this.eventListnerOnce[event].push(fn)
     }
 
     un(event, fn) {
