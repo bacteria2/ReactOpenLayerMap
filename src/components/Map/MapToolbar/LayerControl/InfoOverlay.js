@@ -58,13 +58,14 @@ export default class InfoOverlay extends Component {
         });
         this.map.addOverlay(this.infoOverlay);
         this.infoOverlay.setPosition(undefined);
+
         // display Overlay on click
         this.map.on('click', evt => {
             let feature = this.map.forEachFeatureAtPixel(evt.pixel, feature => feature, {layerFilter: layer => layer.getProperties()['selectable']});
             if (feature) {
                 let coordinates = feature.getGeometry().getCoordinates();
-                let view=    this.map.getView();
-                let {id, type} = feature.getProperties()['layerInfo'];
+                let view=this.map.getView();
+                let {id, type} = feature.getProperties()['featureInfo'];
                 if (type) {
                     this.infoOverlay.setPosition(coordinates);
                     view.centerOn(coordinates,this.map.getSize(),[window.innerWidth/2,window.innerHeight/2]);
@@ -82,8 +83,6 @@ export default class InfoOverlay extends Component {
 
 
     render() {
-        // let id = this.state.id;
-        // let resp = getFeatureById(id);
         let cloudStyle = {
             background: `url(${cloudPopup})`,
             left: 'calc(50% - 30px)',
@@ -91,8 +90,9 @@ export default class InfoOverlay extends Component {
         };
         if (this.state.resp) {
             let OverlayInfo = this[this.state.resp.type];
-            return createPortal([<div className="cloud-popup" style={cloudStyle} key="cloud"/>,
-                    <OverlayInfo {...this.state.resp} key="Overlay"/>]
+            return createPortal([
+                <div className="cloud-popup" style={cloudStyle} key="cloud"/>,
+                <OverlayInfo {...this.state.resp} key="Overlay"/>]
                 , this.el)
         }
         return null;
@@ -118,7 +118,7 @@ export default class InfoOverlay extends Component {
         let {description, label, levelImg, imgText, color} = statusArray[level];
         return (
             <div className="danger-info">
-                <CommonHeader title={props.title} onClickHandler={this.hiddenOverlay}/>
+                <CommonHeader title={props.name} onClickHandler={this.hiddenOverlay}/>
                 <div className="danger-status">
                     <label>当前状态:</label>
                     <span style={{color}}>{label}</span>

@@ -1,5 +1,6 @@
 /**
  * Created by lenovo on 2017/10/25.
+ * 用于控制显示六个不同区域分类的子模块
  */
 import React, {Component} from "react";
 import {createPortal} from "react-dom";
@@ -7,11 +8,14 @@ import {Button, Card, Checkbox} from "antd";
 import {dangerous, goods, hospital, ol, protect, shelter, team} from "../../mapResource";
 import InfoOverlay from "./InfoOverlay";
 import {getFeatureList} from "@/Service/MapService";
+import {distanceBetween} from "../../MapHelper"
 
 const gridStyle = {
     width: '100%',
     textAlign: 'center',
-    padding: '8px'
+    padding: 8,
+    marginTop: -16,
+    zIndex: 14
 };
 
 let grids = [
@@ -22,7 +26,6 @@ let grids = [
     {img: hospital, text: "医疗救助", value: "hospital", visible: false},
     {img: shelter, text: "应急避难", value: "shelter", visible: false}
 ];
-
 
 export default class LayerControl extends Component {
     constructor(props) {
@@ -49,6 +52,9 @@ export default class LayerControl extends Component {
             this.map.addLayer(el);
             this.layerMapper[layerType] = el;
         })
+
+        //初始化范围分析图层
+        this.analyserInit();
     }
 
     state = {
@@ -76,11 +82,73 @@ export default class LayerControl extends Component {
         this.setState({featureList: el.data})
     }
 
+    analyserInit() {
+        this.analyseLayer = new ol.layer.Vector({
+            source: new ol.source.Vector(),
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.5)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 0, 0, 0.5)',
+                    width: 2
+                }),
+                image: new ol.style.Image({
+                    color: 'rgba(255, 255, 255, 0.5)'
+                })
+            })
+        });
+        this.map.addLayer(this.analyseLayer);
+        this.props.eventBus.on("radiusAnalyse", this.radiusAnalyse);
+    }
+
+    /**
+     * 根据传入坐标的半径和类型，查找符合条件的标记
+     * */
+    radiusAnalyse = (evt) => {
+        let {type, radius, coordinate: [x, y]} = evt.data.location;
+        //生成半径为radius的圆
+        this.analyseLayer.getSource().clear();
+        let feature = new ol.Feature({
+            geometry: new ol.geom.Circle([x, y], radius)
+        })
+
+        this.analyseLayer.getSource().addFeature(feature)
+
+        //获取指定类型的图层，不为空则测算该图层内是否有标记点在圆形范围内
+        let targetLayer = this.layerMapper[type];
+        let featureList = [];
+        if (targetLayer) {
+            targetLayer.setVisible(true);
+            targetLayer.getSource().forEachFeatureIntersectingExtent(
+                feature.getGeometry().getExtent(),
+                f => {
+                    let attach = this.radiusAnalyseFeatureHandler(f, {type, coordinate: [x, y]});
+
+                    if (attach) featureList.push(attach)
+                })
+        }
+        return featureList;
+    }
+    /**
+     * 判断feature是否和要求的type一致,并且返回符合条件的feature的id和距离
+     * */
+    radiusAnalyseFeatureHandler(feature, {type, coordinate}) {
+        let {featureInfo: {type: featureType, id}} = feature.getProperties();
+        let featureCoord = feature.getGeometry().getCoordinates();
+        if (type === featureType) {
+            return {id, distance: distanceBetween(coordinate, featureCoord,this.map.getView().getProjection())}
+        }
+    }
+
+
+
+
     addFeature({latitude, type, longitude, id}) {
         let layer = this.layerMapper[type];
         layer.getSource().addFeature(new ol.Feature({
             geometry: new ol.geom.Point([latitude, longitude]),
-            layerInfo: {type, id}
+            featureInfo: {type, id}
         }))
     }
 
@@ -110,9 +178,6 @@ export default class LayerControl extends Component {
         this.controlLayers.forEach(el => el.setVisible(e.target.checked))
     }
 
-    componentWillUpdate() {
-        this.state.featureList.forEach(el => this.addFeature(el))
-    }
 
     componentWillUnmount() {
         this.controlLayers.forEach(el => this.map.removeLayer(el))
@@ -144,6 +209,8 @@ export default class LayerControl extends Component {
                 <div>{el.text}</div>
             </Card.Grid>
         }));
+
+        this.state.featureList.forEach(el => this.addFeature(el))
 
         return <Card title={layerTitle} noHovering style={layerCardStyle}>
             <Checkbox.Group

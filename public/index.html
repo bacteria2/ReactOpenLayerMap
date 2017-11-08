@@ -1,25 +1,87 @@
-<!doctype html>
-<html lang="zh-cn">
-  <head>
-    <meta charset="utf-8">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>TestWindow</title>
     <script src="static/js/config.js"></script>
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <title>TianMapTest</title>
+</head>
+<body>
+<div>
+    <div>
+        <button onclick="message.annotationAdd()">添加一个坐标</button>
+    </div>
+    <div>添加的坐标位置:<span id="coordinate"></span></div>
+</div>
+<hr>
+<div>
+    <div>展示坐标</div>
+    <label>纬度</label><input id="latitude" value="12604618"/>
+    <label>经度</label><input id="longitude" value="2658250"/>
+    <div>
+        <button onclick="display()">OK</button>
+    </div>
+</div>
+<hr>
+<div>
+    <div>范围分析</div>
+    <label>纬度</label><input id="latitude2" value="12616543"/>
+    <label>经度</label><input id="longitude2" value="2654778"/>
+    <label>范围</label><input id="radius" type="number" value="7000"/>m
+    <select id="type">
+        <option label="危险" value="dangerous"></option>
+        <option label="受保护" value="protect">dangerous</option>
+        <option label="医院" value="hospital">dangerous</option>
+    </select>
+    <div>
+        <button onclick="analyse()">OK</button>
+    </div>
+    <div id="featureList">范围内的功能点</div>
+</div>
+<hr>
+<div>
+    <div>
+        <button onclick="message.annotationAdd()">添加一个坐标,只回调一次</button>
+    </div>
+    <div>添加的坐标位置:<span id="coordinate2"></span></div>
+</div>
+<hr>
+<div>
+    <div>子窗口信息</div>
+    <button onclick="message.info()">info</button>
+</div>
+</body>
+<script>
+    var message;
+    function initMapMessage() {
+        //注销时间，避免重复触发
+        document.removeEventListener('DOMContentLoaded', initMapMessage);
+        message = new Message();
+        message.on('annotationLocated', function (data) {
+            document.getElementById('coordinate').innerText = data.join(',')
+        })
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+        //
+        let callOneTime = function (data) {
+            document.getElementById('coordinate2').innerText = data.join(',')
+            message.un('annotationLocated', callOneTime)
+        }
+        message.on('annotationLocated', callOneTime)
+    }
+
+    document.addEventListener('DOMContentLoaded', initMapMessage);
+
+
+    function display() {
+        message.locationDisplay([parseFloat(document.getElementById("latitude").value), parseFloat(document.getElementById("longitude").value)])
+    }
+    function analyse() {
+        message.radiusAnalyse({
+            coordinate: [parseFloat(document.getElementById("latitude2").value),parseFloat( document.getElementById("longitude2").value)],
+            radius: parseInt(document.getElementById("radius").value),
+            type: document.getElementById("type").value
+        })
+    }
+</script>
 </html>

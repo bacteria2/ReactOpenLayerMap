@@ -3,7 +3,7 @@
  */
 import {ol} from './mapResource';
 
-
+const earthSphere=new ol.Sphere(6378137);
 /**
  *  获取最大分辨率
  *  eg:getMaxResolution('EPSG:3857')
@@ -101,4 +101,42 @@ export function getLayers(system,layers){
             maxResolution,minResolution,source:_source
         })
     })
+}
+
+export function formatLength(line) {
+    let length = ol.Sphere.getLength(line);
+    let output;
+    if (length > 1000) {
+        output = `${Math.round(length / 1000 * 100) / 100} km`;
+    } else {
+        output = `${Math.round(length * 100) / 100} m`;
+    }
+    return output;
+}
+
+
+/**
+ * Format area output.
+ * @param {ol.geom.Polygon} polygon The polygon.
+ * @return {string} Formatted area.
+ */
+export function formatArea(polygon) {
+    let area = ol.Sphere.getArea(polygon);
+    let output;
+    if (area > 10000) {
+        output = `${Math.round(area / 1000000 * 100) / 100} km`;
+    } else {
+        output = `${Math.round(area * 100) / 100} m`;
+    }
+    return output;
+}
+
+/**
+ * resovle distance of two point
+ * */
+export function distanceBetween(local1,local2,mapProject){
+    return earthSphere.haversineDistance(
+        ol.proj.transform(local1,mapProject,"EPSG:4326"),
+        ol.proj.transform(local2,mapProject,"EPSG:4326")
+    );
 }

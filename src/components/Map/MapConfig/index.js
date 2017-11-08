@@ -99,7 +99,7 @@ Map.Qingxin = {
     controls: ['zoomSlider', 'scaleLine']
 };
 
-Map.Tianditu = {
+Map.Tian = {
     center: [12614135.26, 2647243.60],
     projection: "EPSG:3857",
     maxZoom: 18,
@@ -118,8 +118,7 @@ Map.Tianditu = {
                 matrixIds:['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'],
                 type:"WMTS"
             }
-        },
-        {
+        },{
             type:"Tile",
             source: {
                 name: "chinese-annotation",

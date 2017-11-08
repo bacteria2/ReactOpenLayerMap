@@ -6,6 +6,8 @@ import {createPortal} from "react-dom";
 import {ol} from "../../mapResource";
 import {Menu, message} from "antd";
 import classnames from "classnames";
+import {formatLength,formatArea} from '../../MapHelper'
+
 /**
  * Format length output.
  * @param {ol.geom.LineString} line The line.
@@ -47,33 +49,7 @@ const measureConfig = {
 
 }
 
-function formatLength(line) {
-    let length = ol.Sphere.getLength(line);
-    let output;
-    if (length > 1000) {
-        output = `${Math.round(length / 1000 * 100) / 100} km`;
-    } else {
-        output = `${Math.round(length * 100) / 100} m`;
-    }
-    return output;
-}
 
-
-/**
- * Format area output.
- * @param {ol.geom.Polygon} polygon The polygon.
- * @return {string} Formatted area.
- */
-function formatArea(polygon) {
-    let area = ol.Sphere.getArea(polygon);
-    let output;
-    if (area > 10000) {
-        output = `${Math.round(area / 1000000 * 100) / 100} km`;
-    } else {
-        output = `${Math.round(area * 100) / 100} m`;
-    }
-    return output;
-}
 
 //react 实现
 let helpTooltipElement;
@@ -166,13 +142,17 @@ export default class Measure extends Component {
                     if (this.map && this.measureLayer)
                         this.addInteraction(key)
                 }}>
-                <Menu.Item key="line">
+                <Menu.Item key="LineString">
                     <span className="icon iconfont">&#xe605;</span>
                     <span style={{marginLeft: 7}}>连线距离</span>
                 </Menu.Item>
-                <Menu.Item key="area">
+                <Menu.Item key="Polygon">
                     <span className="icon iconfont">&#xe603;</span>
                     <span style={{marginLeft: 7}}>多边形面积</span>
+                </Menu.Item>
+                <Menu.Item key="Circle">
+                    <span className="icon iconfont">&#xe656;</span>
+                    <span style={{marginLeft: 7}}>范围</span>
                 </Menu.Item>
             </Menu>
             <div >
@@ -180,7 +160,7 @@ export default class Measure extends Component {
                     Array.isArray(this.state.measureList) && this.state.measureList.length > 0 &&
                     this.state.measureList.map((measure, index) => <MeasureFeature
                         measureLayer={this.measureLayer}
-                        type={measure.type === 'area' ? 'Polygon' : 'LineString'}
+                        type={measure.type}
                         map={this.map}
                         onMeasureRemove={this.handleMeasureRemove}
                         unbindPointerMove={this.unbindPointerMoveHandler}

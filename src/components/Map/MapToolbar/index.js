@@ -7,11 +7,13 @@ import LayerControl from "./LayerControl";
 import MeasureTool from "./MeasureTool";
 import Annotation from './MapAnnotation'
 import "./toolbar.css";
+import MessageEventBus from './MessageEventBus'
 
 export default class extends Component {
     constructor(props) {
         super(props)
         this.map = props.map;
+        this.eventBus=new  MessageEventBus();
     }
     state = {
         showLayerControls: false,
@@ -26,7 +28,7 @@ export default class extends Component {
         return (
             <div id="layerbox_item" style={{position: 'absolute', top: '25px', left: '85px', zIndex: 99}}>
                 <div className="show-list">
-                    <Annotation map={this.map}/>
+                    <Annotation map={this.map} eventBus={this.eventBus}/>
                     <div className="layer_item measure item ">
                         <Dropdown overlay={measure} trigger={['click']}>
                             <span className="icon iconfont">&#xe604;
@@ -44,6 +46,7 @@ export default class extends Component {
                     </div>
                 </div>
                 <LayerControl visible={this.state.showLayerControls}
+                              eventBus={this.eventBus}
                               onClose={() => this.setState({showLayerControls: false})}
                               map={this.props.map}
                 />
