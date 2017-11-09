@@ -8,7 +8,7 @@ import {Button, Card, Checkbox} from "antd";
 import {dangerous, goods, hospital, ol, protect, shelter, team} from "../../mapResource";
 import InfoOverlay from "./InfoOverlay";
 import {getFeatureList} from "@/Service/MapService";
-import {distanceBetween} from "../../MapHelper"
+import {distanceBetween} from "../../MapHelper";
 
 const gridStyle = {
     width: '100%',
@@ -112,38 +112,57 @@ export default class LayerControl extends Component {
         let feature = new ol.Feature({
             geometry: new ol.geom.Circle(coordinate, radius)
         })
-        console.log(feature)
-        this.analyseLayer.getSource().addFeature(feature)
 
-        //获取指定类型的图层，不为空则测算该图层内是否有标记点在圆形范围内
-        let targetLayer = this.layerMapper[type];
+        this.analyseLayer.getSource().addFeature(feature)
         let featureList = [];
-        if (targetLayer) {
-            targetLayer.setVisible(true);
-            targetLayer.getSource().forEachFeatureIntersectingExtent(
-                feature.getGeometry().getExtent(),
-                f => {
-                    let attach = this.radiusAnalyseFeatureHandler(f, {type, coordinate});
-                    if (attach) featureList.push(attach)
-                })
+        //获取指定类型的图层，不为空则测算该图层内是否有标记点在圆形范围内
+        //如果type为空则查全部layer
+        if (type) {
+            let targetLayer = this.layerMapper[type];
+            if (targetLayer) {
+                featureList= featureList.concat(this.radiusAnalyseLayerHandler(targetLayer, feature.getGeometry().getExtent(), type, coordinate))
+            }
+        } else {
+            this.controlLayers.forEach(targetLayer=>{
+                featureList= featureList.concat(this.radiusAnalyseLayerHandler(targetLayer, feature.getGeometry().getExtent(), "", coordinate))
+            })
         }
         //跨窗口发送数据
-        evt.source.postMessage({type:"radiusAnalyse",data:featureList},window.origin);
+        evt.source.postMessage({type: "radiusAnalyse", data: featureList}, window.origin);
         return featureList;
     }
-    /**
-     * 判断feature是否和要求的type一致,并且返回符合条件的feature的id和距离
-     * */
-    radiusAnalyseFeatureHandler(feature, {type, coordinate}) {
-        let {featureInfo: {type: featureType, id}} = feature.getProperties();
-        let featureCoord = feature.getGeometry().getCoordinates();
-        if (type === featureType) {
-            return {id, distance: distanceBetween(coordinate, featureCoord,this.map.getView().getProjection())}
-        }
+
+    radiusAnalyseLayerHandler(layer, extent, type, coordinate) {
+        let featureList = [];
+        layer.setVisible(true);
+        layer.getSource().forEachFeatureIntersectingExtent(extent, feature => {
+            // let attach = this.featureHandler(feature, coordinate, type);
+            let featureInfo = feature.getProperties().featureInfo;
+            let[pX,pY]= feature.getGeometry().getCoordinates();
+            //type为空或者type和featureInfo的type想同则返回feature
+            if (featureInfo && (!type || type === featureInfo.type)) {
+                featureList.push({
+                    id: featureInfo.id,
+                    distance: distanceBetween(coordinate,[parseFloat(pX),parseFloat(pY)] , this.map.getView().getProjection())
+                })
+            }
+        });
+        return featureList;
     }
 
-
-
+    /**
+     * 返回feature的id和距离
+     * */
+    featureHandler(feature, coordinate, type) {
+        let featureInfo = feature.getProperties().featureInfo;
+        //type为空或者type和featureInfo的type想同则返回feature
+        if (featureInfo && (!type || type === featureInfo.type)) {
+            return {
+                id: featureInfo.id,
+                distance: distanceBetween(coordinate, feature.getGeometry().getCoordinates(), this.map.getView().getProjection())
+            }
+        }
+    }
 
     addFeature({latitude, type, longitude, id}) {
         let layer = this.layerMapper[type];

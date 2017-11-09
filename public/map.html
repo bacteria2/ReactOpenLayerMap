@@ -4,7 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>TestWindow</title>
-    <script src="static/js/config.js"></script>
+    <script src="./static/js/proj4.js"></script>
+    <script>
+        proj4.defs("EPSG:4490", "+proj=longlat +ellps=GRS80 +no_defs");
+        var config={
+            mapType:"TianC",
+        }
+    </script>
   </head>
   <body>
     <noscript>

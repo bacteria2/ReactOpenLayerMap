@@ -11,10 +11,8 @@ const earthSphere=new ol.Sphere(6378137);
 function getMaxResolution(system) {
     if (!system)
         return null;
-    if (system === 'EPSG:4490')
-        return ol.extent.getWidth([-180, -90, 180, 90]) / 256;
-    let  projection = ol.proj.get(system);
-    return ol.extent.getWidth(projection.getExtent()) / 256;
+    let maxResolution=ol.extent.getWidth(ol.proj.get(system).getExtent()) / 256;
+    return maxResolution
 }
 /**
  *  获取地图范围
@@ -33,8 +31,6 @@ function getExtent(system) {
 function getOrigin(system) {
     if (!system)
         throw new Error("system is null");
-    if (system === 'EPSG:4490')
-        return [-180, 90];
     return ol.extent.getTopLeft(getExtent(system))
 }
 /**
@@ -52,12 +48,12 @@ function getResolution(system, matrixIds) {
 /**
  * 根据矩阵ID获取tileGrid
  * */
-function getTileGrid(system, matrixIds) {
+function getTileGrid(system, matrixIds,extent) {
     if (!system || !Array.isArray(matrixIds))
         throw new Error("system is null or matrixIds isn't an array");
     return  new ol.tilegrid.WMTS({
         origin: getOrigin(system),
-        extent:getExtent(system),
+        extent:extent||getExtent(system),
         resolutions: getResolution(system,matrixIds),
         matrixIds: matrixIds
     })
@@ -87,11 +83,11 @@ export function getLayers(system,layers){
     return layers.map(el=>{
         let {maxResolution,minResolution,
             source:{
-              name,layer,url,style,matrixSet,format,matrixIds
+                extent,name,layer,url,style,matrixSet,format,matrixIds
             }
         }=el;
 
-        let tileGrid=getTileGrid(system,matrixIds);
+        let tileGrid=getTileGrid(system,matrixIds,extent);
 
         let _source=new ol.source.WMTS({
             name,layer,url,style,matrixSet,format,tileGrid
@@ -103,8 +99,8 @@ export function getLayers(system,layers){
     })
 }
 
-export function formatLength(line) {
-    let length = ol.Sphere.getLength(line);
+export function formatLength(line,projection="EPSG:3857 ") {
+    let length = ol.Sphere.getLength(line,{projection});
     let output;
     if (length > 1000) {
         output = `${Math.round(length / 1000 * 100) / 100} km`;
@@ -120,8 +116,8 @@ export function formatLength(line) {
  * @param {ol.geom.Polygon} polygon The polygon.
  * @return {string} Formatted area.
  */
-export function formatArea(polygon) {
-    let area = ol.Sphere.getArea(polygon);
+export function formatArea(polygon,projection="EPSG:3857 ") {
+    let area = ol.Sphere.getArea(polygon,{projection});
     let output;
     if (area > 10000) {
         output = `${Math.round(area / 1000000 * 100) / 100} km`;

@@ -7,4 +7,4 @@ import registerServiceWorker from './registerServiceWorker';
 import Config from './config'
 
 ReactDOM.render(<Map mapConfig={Config.mapType}/>, document.getElementById('root'));
-registerServiceWorker();
+//registerServiceWorker();

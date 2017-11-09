@@ -255,10 +255,10 @@ class MeasureFeature extends Component {
             this.listener = this.feature.getGeometry().on('change', (evt) => {
                 let geom = evt.target;
                 if (geom instanceof ol.geom.Polygon) {
-                    output = <span>{formatArea(geom)}<sup>2</sup></span>;
+                    output = <span>{formatArea(geom,this.map.getView().getProjection())}<sup>2</sup></span>;
                     tooltipCoord = geom.getInteriorPoint().getCoordinates();
                 } else if (geom instanceof ol.geom.LineString) {
-                    output = formatLength(geom);
+                    output = formatLength(geom,this.map.getView().getProjection());
                     tooltipCoord = geom.getLastCoordinate();
                 }
                 this.measureOverlay.setPosition(tooltipCoord);

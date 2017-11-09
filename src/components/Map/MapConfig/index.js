@@ -15,6 +15,7 @@ Map.Qingxin = {
             maxResolution:0.0028,
             minResolution:0.00008,
             source: {
+                extent: [111.796875, 23.203125, 114.609375, 25.3125],
                 name: "L9_L14",
                 layer: "L9_L14D",
                 url: "http://19.168.104.247/qy_dlg_gov/wmts",
@@ -29,6 +30,7 @@ Map.Qingxin = {
             maxResolution:0.0028,
             minResolution:0.00008,
             source: {
+                extent: [111.796875, 23.203125, 114.609375, 25.3125],
                 name: "L9_L14zj",
                 layer: "L9_L14DLGZJ",
                 url: "http://19.168.104.247/qy_dlg_gov_zj/wmts",
@@ -43,6 +45,7 @@ Map.Qingxin = {
             maxResolution:0.00008,
             minResolution:0.00001,
             source: {
+                extent: [111.796875, 23.203125, 114.609375, 25.3125],
                 name: "L15_L17",
                 layer: "DLG_GOV_L15toL17",
                 url: "http://19.168.104.247/qy_dlg_gov/wmts",
@@ -57,6 +60,7 @@ Map.Qingxin = {
             maxResolution:0.00008,
             minResolution:0.00001,
             source: {
+                extent: [111.796875, 23.203125, 114.609375, 25.3125],
                 name: "L15_L17zj",
                 layer: "test",
                 url: "http://19.168.104.247/qy_dlg_gov_zj/wmts",
@@ -71,6 +75,7 @@ Map.Qingxin = {
             maxResolution:0.00001,
             minResolution:0.0000026,
             source: {
+                extent: [111.796875, 23.203125, 114.609375, 25.3125],
                 name: "L18_L19",
                 layer: "L20",
                 url: "http://19.168.104.247/qy_dlg_gov/wmts",
@@ -85,6 +90,7 @@ Map.Qingxin = {
             maxResolution:0.00001,
             minResolution:0.0000026,
             source: {
+                extent: [111.796875, 23.203125, 114.609375, 25.3125],
                 name: "L18_L19zj",
                 layer: "L20",
                 url: "http://19.168.104.247/qy_dlg_gov_zj/wmts",
@@ -99,7 +105,7 @@ Map.Qingxin = {
     controls: ['zoomSlider', 'scaleLine']
 };
 
-Map.Tian = {
+Map.TianW = {
     center: [12614135.26, 2647243.60],
     projection: "EPSG:3857",
     maxZoom: 18,
@@ -126,6 +132,42 @@ Map.Tian = {
                 url: "http://t0.tianditu.com/cva_w/wmts",
                 style: "default",
                 matrixSet: "w",
+                matrixIds:['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'],
+                format: "tiles",
+                type:"WMTS"
+            }
+        }
+    ],
+    controls: ['zoomSlider', 'scaleLine']
+};
+
+Map.TianC = {
+    center: [113.0375, 23.7078],
+    projection: "EPSG:4490",
+    maxZoom: 18,
+    minZoom: 1,
+    zoom: 12,
+    layers: [
+        {
+            type:"Tile",
+            source: {
+                name: "map",
+                layer: "vec",
+                url: "http://t0.tianditu.com/vec_c/wmts",
+                style: "default",
+                matrixSet: "c",
+                format: "tiles",
+                matrixIds:['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'],
+                type:"WMTS"
+            }
+        },{
+            type:"Tile",
+            source: {
+                name: "chinese-annotation",
+                layer: "cva",
+                url: "http://t0.tianditu.com/cva_c/wmts",
+                style: "default",
+                matrixSet: "c",
                 matrixIds:['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'],
                 format: "tiles",
                 type:"WMTS"

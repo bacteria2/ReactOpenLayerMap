@@ -2,7 +2,6 @@
  * Created by lenovo on 2017/10/25.
  */
 import React, {Component} from "react";
-import proj4 from "proj4";
 import {ol} from "./mapResource";
 import './index.css'
 import {getControls, getLayers} from "./MapHelper";
@@ -15,8 +14,9 @@ function mapInitialize({
                        }) {
     let _projection = projection;
     if (projection === "EPSG:4490") {
-        proj4.defs("EPSG:4490", "+proj=longlat +ellps=GRS80 +no_defs");
-        _projection= ol.proj.get("EPSG:4490").setExtent([-180, -90, 180, 90]);
+        _projection= ol.proj.get("EPSG:4490");
+        _projection.setExtent([-180, -90, 180, 90]);
+        console.log(_projection)
     }
 
     return  new ol.Map({
@@ -36,7 +36,7 @@ function mapInitialize({
 export default class OpenalayerMap extends Component {
     constructor(props) {
         super(props);
-        let config = MapConfig[this.props.mapConfig] || MapConfig.Tianditu;
+        let config = MapConfig[this.props.mapConfig] || MapConfig.TianW;
         this.map = mapInitialize(config);
     }
     componentDidMount() {
