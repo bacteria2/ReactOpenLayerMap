@@ -3,7 +3,7 @@
  * 用于添加标记并且返回
  */
 import React, {Component} from "react";
-import {location, ol} from "../../mapResource";
+import {ol} from "../../mapResource";
 import {locationMap,annotationConfig} from "../../Const";
 
 function getAnnotationLayer() {
@@ -16,7 +16,11 @@ function getAnnotationLayer() {
             image: new ol.style.Icon({
                 src: annotationConfig.annotation.imageSrc,
                 anchor: annotationConfig.annotation.imageAnchor
-            })
+            }),
+            stroke: new ol.style.Stroke({
+                width: annotationConfig.annotation.stokeWidth,
+                color:annotationConfig.annotation.strokeColor
+            }),
         })
     })
 }
@@ -26,6 +30,7 @@ function getEventLayer() {
     return new ol.layer.Vector({
         source: new ol.source.Vector(),
         selectable: true,
+
     })
 }
 
@@ -91,7 +96,6 @@ export default class MapAnnotation extends Component {
                         src: local.img
                     })
                 }));
-
                 this.eventLayer.getSource().addFeature(feature)
             }
         }
@@ -100,18 +104,8 @@ export default class MapAnnotation extends Component {
             let feature = new ol.Feature({
                 geometry: new ol.geom.Circle(coordinate, radius)
             });
-
-            feature.setStyle(new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: annotationConfig.circle.fillColor
-                }),
-                stroke: new ol.style.Stroke({
-                    width: annotationConfig.circle.stokeWidth,
-                    color:annotationConfig.circle.strokeColor
-                }),
-            }))
             this.layer.getSource().addFeature(feature);
-            console.log(radius,coordinate)
+
         }
     }
 

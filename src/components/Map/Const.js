@@ -72,13 +72,10 @@ export const layerControlConfig={
 
 export const annotationConfig={
     annotation:{
-        fillColor:'red',
+        fillColor:'rgba(255,200,200,0.5)',
+        stokeWidth:3,
+        strokeColor:"#ff5b58",
         imageSrc:location,
         imageAnchor:[0.5,1]
-    },
-    circle:{
-        fillColor:'rgba(255,200,200,0.5)',
-        stokeWidth:2,
-        strokeColor:"#ff5b58",
     }
 }
