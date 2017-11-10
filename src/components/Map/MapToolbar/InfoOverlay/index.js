@@ -3,8 +3,9 @@
  */
 import React, {Component} from "react";
 import {createPortal} from "react-dom";
-import {cloudPopup, level1, level2, level3, level4, nullImage, ol, timeAxis, timeBtn} from "../../mapResource";
+import {cloudPopup, nullImage, ol, timeAxis, timeBtn} from "../../mapResource";
 import {getFeatureById} from "@/Service/MapService";
+import {statusArray} from '../../Const';
 
 function LayerLabel({title, content}) {
     return <div className="layer-info-label">
@@ -37,12 +38,11 @@ function AlertTd({label, value}) {
         </td>]
 }
 
-const statusArray = [
-    {label: "正常", description: '正常', levelImg: level1, imgText: "正常等级", color: '#5ffd00'},
-    {label: "警示", description: '警示', levelImg: level2, imgText: "警示等级", color: '#fde500'},
-    {label: "发生预警", description: '发生预警', levelImg: level3, imgText: "预警等级", color: '#FD6300'},
-    {label: "危险", description: '危险', levelImg: level4, imgText: "危险等级", color: '#fd0c1c'},
-];
+
+
+/**
+ * 根据layer是否能被选择，展示显示提示信息
+ * */
 
 export default class InfoOverlay extends Component {
     constructor(props) {
@@ -64,14 +64,19 @@ export default class InfoOverlay extends Component {
             let feature = this.map.forEachFeatureAtPixel(evt.pixel, feature => feature, {layerFilter: layer => layer.getProperties()['selectable']});
             if (feature) {
                 let coordinates = feature.getGeometry().getCoordinates();
-                let view=this.map.getView();
-                let {id, type} = feature.getProperties()['featureInfo'];
+                let view = this.map.getView();
+                let {id, type, data} = feature.getProperties()['featureInfo'];
                 if (type) {
                     this.infoOverlay.setPosition(coordinates);
-                    view.centerOn(coordinates,this.map.getSize(),[window.innerWidth/2,window.innerHeight/2]);
-                    getFeatureById(id).then(el => {
-                        this.setState({resp: el.data});
-                    })
+                    //view.setCenter(coordinates);
+                    view.animate({
+                        center: coordinates,
+                        duration: 2000
+                    });
+                    if (data)
+                        this.setState({resp: data});
+                    else
+                        getFeatureById(id).then(el => this.setState({resp: el.data}))
                 }
             }
         });
@@ -91,8 +96,8 @@ export default class InfoOverlay extends Component {
         if (this.state.resp) {
             let OverlayInfo = this[this.state.resp.type];
             return createPortal([
-                <div className="cloud-popup" style={cloudStyle} key="cloud"/>,
-                <OverlayInfo {...this.state.resp} key="Overlay"/>]
+                    <div className="cloud-popup" style={cloudStyle} key="cloud"/>,
+                    <OverlayInfo {...this.state.resp} key="Overlay"/>]
                 , this.el)
         }
         return null;
@@ -104,6 +109,19 @@ export default class InfoOverlay extends Component {
     defaultInfo() {
         return <div className="defaultInfo-info">some wrong with sever</div>
     }
+
+    event = (props) => (<div className="location-event">
+        <CommonHeader title={props.name} split onClickHandler={this.hiddenOverlay}/>
+        <div className="layer-info-table">
+            <div className="label-content">
+                <LayerLabel title="名称" content={props.name}/>
+                <LayerLabel title="事件" content={props.event}/>
+                <LayerLabel title="概况" content={props.description}/>
+            </div>
+            <img className="layer-info-image"
+                 src={props.image ? props.image : nullImage}/>
+        </div>
+    </div>)
 
     dangerous = (props) => {
         let level = 3;
@@ -171,7 +189,6 @@ export default class InfoOverlay extends Component {
                 <div style={{height: 15}}/>
             </div>)
     }
-
 
     protect = (props) => {
         return (

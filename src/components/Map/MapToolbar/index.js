@@ -6,6 +6,7 @@ import {Dropdown, Icon} from "antd";
 import LayerControl from "./LayerControl";
 import MeasureTool from "./MeasureTool";
 import Annotation from './MapAnnotation'
+import InfoOverlay from  './InfoOverlay'
 import "./toolbar.css";
 import MessageEventBus from './MessageEventBus'
 
@@ -50,6 +51,7 @@ export default class extends Component {
                               onClose={() => this.setState({showLayerControls: false})}
                               map={this.props.map}
                 />
+                <InfoOverlay map={this.map}/>
             </div>
         )
     }

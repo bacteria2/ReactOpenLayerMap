@@ -7,48 +7,7 @@ import {ol} from "../../mapResource";
 import {Menu, message} from "antd";
 import classnames from "classnames";
 import {formatLength,formatArea} from '../../MapHelper'
-
-/**
- * Format length output.
- * @param {ol.geom.LineString} line The line.
- * @return {string} The formatted length.
- */
-const measureConfig = {
-    strokeColor: "#f4e209",//
-    helpTooltip: {
-        helpMsg: '单击增加起点',//跟随鼠标的提示框
-        offset: [15, 0],
-        positioning: 'center-left'
-    },
-    measureTooltip: {
-        measureMsg: '单击增加起点,双击结束',//开始描点以后的提示框
-        offset: [0, -15],
-        positioning: 'bottom-center'
-    },
-    measureLayer: {
-        fillColor: 'rgba(255, 255, 255, 0.5)',
-        strokeColor: '#1d8aa4',
-        strokeWidth: 2,
-        imageRadius: 7,
-        imageFillColor: '#1d8aa4',
-    },
-    draw: {
-        fillColor: 'rgba(255, 255, 255, 0.5)',
-        strokeColor: 'rgba(0, 0, 0, 0.5)',
-        strokeWidth: 2,
-        strokeLineDash: [10, 10],
-        imageStrokeColor: 'rgba(0, 0, 0, 0.7)',
-        imageRadius: 5,
-        imageFillColor: 'rgba(255, 255, 255, 0.2)'
-
-    },
-    strokeWidth: 2,//
-    imageColor: "#1d8aa4",//
-    imageRadius: 7,//
-    fillColor: 'rgba(255, 255, 255, 0.2)'//
-
-}
-
+import {measureConfig} from '../../Const'
 
 
 //react 实现

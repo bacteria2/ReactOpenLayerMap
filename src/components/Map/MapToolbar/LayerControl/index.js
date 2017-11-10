@@ -5,10 +5,10 @@
 import React, {Component} from "react";
 import {createPortal} from "react-dom";
 import {Button, Card, Checkbox} from "antd";
-import {dangerous, goods, hospital, ol, protect, shelter, team} from "../../mapResource";
-import InfoOverlay from "./InfoOverlay";
+import {ol} from "../../mapResource";
 import {getFeatureList} from "@/Service/MapService";
 import {distanceBetween} from "../../MapHelper";
+import {locationList,layerControlConfig} from '../../Const'
 
 const gridStyle = {
     width: '100%',
@@ -18,21 +18,12 @@ const gridStyle = {
     zIndex: 14
 };
 
-let grids = [
-    {img: dangerous, text: "危险源点", value: "dangerous", visible: false},
-    {img: protect, text: "重点防护", value: "protect", visible: false},
-    {img: team, text: "应急队伍", value: "team", visible: false},
-    {img: goods, text: "应急物资", value: "goods", visible: false},
-    {img: hospital, text: "医疗救助", value: "hospital", visible: false},
-    {img: shelter, text: "应急避难", value: "shelter", visible: false}
-];
-
 export default class LayerControl extends Component {
     constructor(props) {
         super(props);
         this.layerMapper = {};
         //控制图层转换映射mapper
-        this.controlLayers = grids.map(el => new ol.layer.Vector({
+        this.controlLayers = locationList.map(el => new ol.layer.Vector({
                 source: new ol.source.Vector(),
                 style: new ol.style.Style({
                     image: new ol.style.Icon({
@@ -71,9 +62,7 @@ export default class LayerControl extends Component {
             if (e.dragging)  return;
             let pixel = this.map.getEventPixel(e.originalEvent);
             let hit = this.map.hasFeatureAtPixel(pixel, {
-                layerFilter: function (layer) {
-                    return layer.getProperties()['selectable']
-                }
+                layerFilter(layer){return layer.getProperties()['selectable']}
             });
             let ele = document.getElementById(this.map.getTarget());
             ele.style.cursor = hit ? 'pointer' : '';
@@ -87,14 +76,14 @@ export default class LayerControl extends Component {
             source: new ol.source.Vector(),
             style: new ol.style.Style({
                 fill: new ol.style.Fill({
-                    color: 'rgba(255, 255, 255, 0.5)'
+                    color: layerControlConfig.radiusAnalyse.fillColor
                 }),
                 stroke: new ol.style.Stroke({
-                    color: 'rgba(0, 0, 0, 0.5)',
-                    width: 2
+                    color: layerControlConfig.radiusAnalyse.strokeColor,
+                    width: layerControlConfig.radiusAnalyse.stokeWidth
                 }),
                 image: new ol.style.Image({
-                    color: 'rgba(255, 255, 255, 0.5)'
+                    color: layerControlConfig.radiusAnalyse.imageColor
                 })
             })
         });
@@ -175,12 +164,12 @@ export default class LayerControl extends Component {
     onChange = (checkedList) => {
         this.setState({
             checkedList,
-            indeterminate: !!checkedList.length && (checkedList.length < grids.length),
-            checkAll: checkedList.length === grids.length,
+            indeterminate: !!checkedList.length && (checkedList.length < locationList.length),
+            checkAll: checkedList.length === locationList.length,
         });
         //选中的图层可见，未选中的图层不可见
         let checked = checkedList.join("");
-        grids.forEach((el, index) => {
+        locationList.forEach((el, index) => {
             if (checked.includes(el.value))
                 this.controlLayers[index].setVisible(true);
             else
@@ -190,7 +179,7 @@ export default class LayerControl extends Component {
     }
     onCheckAllChange = (e) => {
         this.setState({
-            checkedList: e.target.checked ? grids.map(el => el.value) : [],
+            checkedList: e.target.checked ? locationList.map(el => el.value) : [],
             indeterminate: false,
             checkAll: e.target.checked,
         });
@@ -222,7 +211,7 @@ export default class LayerControl extends Component {
             </div>);
 
         //图层选项
-        let checkOptions = grids.map((el, index) => ({
+        let checkOptions = locationList.map((el, index) => ({
             value: el.value,
             label: <Card.Grid style={gridStyle} key={el.text + index}>
                 <img src={el.img} className="layer-card-icon"/>
@@ -238,7 +227,6 @@ export default class LayerControl extends Component {
                 value={this.state.checkedList}
                 onChange={this.onChange} style={{position: "absolute"}}>
             </Checkbox.Group>
-            <InfoOverlay map={this.map}/>
         </Card>
     }
 }

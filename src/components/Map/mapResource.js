@@ -10,6 +10,7 @@ export {default as team }  from "../../assets/gis/point/layer_team.png";
 export {default as goods }  from "../../assets/gis/point/layer_goods.png";
 export {default as hospital }  from "../../assets/gis/point/layer_hsptl.png";
 export {default as shelter }  from "../../assets/gis/point/layer_shelter.png";
+export {default as event }  from "../../assets/gis/point/layer_event_a.gif";
 export {default as location }  from "../../assets/gis/point/location.png";
 export {default as level1 }  from "../../assets/gis/other/level1.png";
 export {default as level2 }  from "../../assets/gis/other/level2.png";

@@ -46,9 +46,9 @@ export default class Message {
 
     annotationAdd=()=>this.executeWithWinOpened(()=> this.win.postMessage({type: 'annotationAdd'}, window.origin));
 
-    locationDisplay=([x,y])=>this.executeWithWinOpened(
-        ([p1,p2])=> this.win.postMessage({type: 'locationDisplay', coordinate: [p1, p2]}, window.origin)
-        ,[x,y]);
+    locationDisplay=(...args)=>this.executeWithWinOpened(
+        ([p1,p2],featureInfo,radius)=> this.win.postMessage({type: 'locationDisplay', coordinate: [p1, p2],radius,featureInfo}, window.origin)
+        ,...args);
 
     radiusAnalyse=(target)=>this.executeWithWinOpened(
         location=> this.win.postMessage({type: 'radiusAnalyse', location}, window.origin)

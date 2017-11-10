@@ -313,7 +313,7 @@
 }
 
 /*goods类别 team 类别*/
-.layer-info .goods-info, .team-info, .hospital-info, .shelter-info, .protect-info {
+.layer-info .goods-info, .team-info, .hospital-info, .shelter-info, .protect-info, .location-event {
     width: 420px;
 }
 

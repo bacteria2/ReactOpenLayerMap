@@ -16,17 +16,18 @@ function mapInitialize({
     if (projection === "EPSG:4490") {
         _projection= ol.proj.get("EPSG:4490");
         _projection.setExtent([-180, -90, 180, 90]);
-        console.log(_projection)
     }
 
     return  new ol.Map({
         layers: [...getLayers(projection, layers)],
         controls: ol.control.defaults().extend(getControls(controls)),
+        loadTilesWhileAnimating: true,
         view: new ol.View({
             center,
             minZoom,
             maxZoom,
             zoom,
+
             projection: _projection,
         })
     })
