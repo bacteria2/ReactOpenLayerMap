@@ -156,7 +156,7 @@ export default class LayerControl extends Component {
     addFeature({latitude, type, longitude, id}) {
         let layer = this.layerMapper[type];
         layer.getSource().addFeature(new ol.Feature({
-            geometry: new ol.geom.Point([latitude, longitude]),
+            geometry: new ol.geom.Point([longitude,latitude ]),
             featureInfo: {type, id}
         }))
     }

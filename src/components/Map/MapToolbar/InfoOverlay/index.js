@@ -115,7 +115,7 @@ export default class InfoOverlay extends Component {
         <div className="layer-info-table">
             <div className="label-content">
                 <LayerLabel title="名称" content={props.name}/>
-                <LayerLabel title="事件" content={props.event}/>
+                <LayerLabel title="时间" content={props.event}/>
                 <LayerLabel title="概况" content={props.description}/>
             </div>
             <img className="layer-info-image"
