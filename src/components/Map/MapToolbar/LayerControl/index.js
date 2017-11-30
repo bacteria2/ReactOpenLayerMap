@@ -8,7 +8,7 @@ import {Button, Card, Checkbox} from "antd";
 import {ol} from "../../mapResource";
 import {getFeatureList} from "@/Service/MapService";
 import {distanceBetween} from "../../MapHelper";
-import {locationList,layerControlConfig} from '../../Const'
+import {layerControlConfig, locationList} from "../../Const";
 
 const gridStyle = {
     width: '100%',
@@ -62,7 +62,9 @@ export default class LayerControl extends Component {
             if (e.dragging)  return;
             let pixel = this.map.getEventPixel(e.originalEvent);
             let hit = this.map.hasFeatureAtPixel(pixel, {
-                layerFilter(layer){return layer.getProperties()['selectable']}
+                layerFilter(layer){
+                    return layer.getProperties()['selectable']
+                }
             });
             let ele = document.getElementById(this.map.getTarget());
             ele.style.cursor = hit ? 'pointer' : '';
@@ -96,6 +98,9 @@ export default class LayerControl extends Component {
      * */
     radiusAnalyse = (evt) => {
         let {type, radius, coordinate} = evt.data.location;
+        console.log(evt.data.location)
+        if (!Array.isArray(type))
+            return
         //生成半径为radius的圆
         this.analyseLayer.getSource().clear();
         let feature = new ol.Feature({
@@ -104,18 +109,17 @@ export default class LayerControl extends Component {
 
         this.analyseLayer.getSource().addFeature(feature)
         let featureList = [];
-        //获取指定类型的图层，不为空则测算该图层内是否有标记点在圆形范围内
-        //如果type为空则查全部layer
-        if (type) {
-            let targetLayer = this.layerMapper[type];
-            if (targetLayer) {
-                featureList= featureList.concat(this.radiusAnalyseLayerHandler(targetLayer, feature.getGeometry().getExtent(), type, coordinate))
-            }
-        } else {
-            this.controlLayers.forEach(targetLayer=>{
-                featureList= featureList.concat(this.radiusAnalyseLayerHandler(targetLayer, feature.getGeometry().getExtent(), "", coordinate))
-            })
+        //获取指定类型的图层，不为空则测算该图层内是否有标记点在圆形范围内,为空则计算全部类型
+        if (type.length === 0) {
+            type=['hospital','protect','dangerous']
         }
+        type.forEach(el => {
+            let targetLayer = this.layerMapper[el];
+            if (targetLayer) {
+                featureList = featureList.concat(this.radiusAnalyseLayerHandler(targetLayer, feature.getGeometry().getExtent(), el, coordinate))
+            }
+        })
+
         //跨窗口发送数据
         evt.source.postMessage({type: "radiusAnalyse", data: featureList}, window.origin);
         return featureList;
@@ -125,14 +129,13 @@ export default class LayerControl extends Component {
         let featureList = [];
         layer.setVisible(true);
         layer.getSource().forEachFeatureIntersectingExtent(extent, feature => {
-            // let attach = this.featureHandler(feature, coordinate, type);
             let featureInfo = feature.getProperties().featureInfo;
-            let[pX,pY]= feature.getGeometry().getCoordinates();
-            //type为空或者type和featureInfo的type想同则返回feature
+            let [pX, pY] = feature.getGeometry().getCoordinates();
+
             if (featureInfo && (!type || type === featureInfo.type)) {
                 featureList.push({
                     id: featureInfo.id,
-                    distance: distanceBetween(coordinate,[parseFloat(pX),parseFloat(pY)] , this.map.getView().getProjection())
+                    distance: distanceBetween(coordinate, [parseFloat(pX), parseFloat(pY)], this.map.getView().getProjection())
                 })
             }
         });
@@ -156,7 +159,7 @@ export default class LayerControl extends Component {
     addFeature({latitude, type, longitude, id}) {
         let layer = this.layerMapper[type];
         layer.getSource().addFeature(new ol.Feature({
-            geometry: new ol.geom.Point([longitude,latitude ]),
+            geometry: new ol.geom.Point([longitude, latitude]),
             featureInfo: {type, id}
         }))
     }
