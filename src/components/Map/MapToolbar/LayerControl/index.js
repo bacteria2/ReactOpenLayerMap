@@ -9,6 +9,7 @@ import {ol} from "../../mapResource";
 import {getFeatureList} from "@/Service/MapService";
 import {distanceBetween} from "../../MapHelper";
 import {layerControlConfig, locationList} from "../../Const";
+import {List} from 'immutable';
 
 const gridStyle = {
     width: '100%',
@@ -53,7 +54,8 @@ export default class LayerControl extends Component {
         indeterminate: false,
         checkedList: [],
         checkAll: false,
-        featureList: [],
+        loaded:false,
+        featureList: List(),
     }
 
     async componentDidMount() {
@@ -70,7 +72,8 @@ export default class LayerControl extends Component {
             ele.style.cursor = hit ? 'pointer' : '';
         })
         let el = await getFeatureList();
-        this.setState({featureList: el.data})
+        this.setState({featureList:List.of(...el.data) ,loaded:true})
+
     }
 
     analyserInit() {
@@ -96,9 +99,13 @@ export default class LayerControl extends Component {
     /**
      * 根据传入坐标的半径和类型，查找符合条件的标记
      * */
-    radiusAnalyse = (evt) => {
+    radiusAnalyse = async (evt) => {
+        //地图关闭时打开需要先完成featureList的加载
+        if (!this.state.loaded) {
+            let el = await getFeatureList();
+            this.setState({featureList:List.of(...el.data) ,loaded:true})
+        }
         let {type, radius, coordinate} = evt.data.location;
-        console.log(evt.data.location)
         if (!Array.isArray(type))
             return
         //生成半径为radius的圆
@@ -111,7 +118,7 @@ export default class LayerControl extends Component {
         let featureList = [];
         //获取指定类型的图层，不为空则测算该图层内是否有标记点在圆形范围内,为空则计算全部类型
         if (type.length === 0) {
-            type=['hospital','protect','dangerous']
+            type = ['hospital', 'protect', 'dangerous']
         }
         type.forEach(el => {
             let targetLayer = this.layerMapper[el];
@@ -128,7 +135,7 @@ export default class LayerControl extends Component {
     radiusAnalyseLayerHandler(layer, extent, type, coordinate) {
         let featureList = [];
         layer.setVisible(true);
-        layer.getSource().forEachFeatureIntersectingExtent(extent, feature => {
+        layer.getSource().forEachFeatureInExtent(extent, feature => {
             let featureInfo = feature.getProperties().featureInfo;
             let [pX, pY] = feature.getGeometry().getCoordinates();
 
@@ -221,7 +228,8 @@ export default class LayerControl extends Component {
                 <div>{el.text}</div>
             </Card.Grid>
         }));
-
+        //清理旧数据
+        this.controlLayers.forEach(el=>el.getSource().clear());
         this.state.featureList.forEach(el => this.addFeature(el))
 
         return <Card title={layerTitle} noHovering style={layerCardStyle}>

@@ -31,7 +31,7 @@
     <div>范围分析</div>
     <label>纬度</label><input id="latitude2" value="113.037"/>
     <label>经度</label><input id="longitude2" value="23.70783"/>
-    <label>范围</label><input id="radius" type="number" value="0.05"/>x100km
+    <label>范围</label><input id="radius" type="number" value="0.1"/>x100km
     <select id="type">
         <option label="危险" value="dangerous"></option>
         <option label="受保护" value="protect">dangerous</option>
@@ -104,12 +104,13 @@
                     event:"xxx群体事件22222222222222",
                     description:"xxx群体事件1111111111111111",
                     type: "event"
-                },0.05)
+                },0.1)
     }
     function analyse() {
         message.once('radiusAnalyse', function (data) {
             let listDiv = document.getElementById('featureList')
             let children = "";
+            console.log(data)
             data.forEach(function (feature) {
                 children += `<li>距离:` + feature.distance + `m,ID:` + feature.id + `</li>`
             })
